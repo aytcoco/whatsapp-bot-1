@@ -1,154 +1,124 @@
-/* Copyright (C) 2022 Sourav KL11.
-Licensed under the  GPL-3.0 License;
-you may not use this file except in compliance with the License.
-Raganork MD - Sourav KL11
-*/
+const bot = require('../lib/events')
 const {
-  FancyRandom,
-  getListFromCommand,
-  skbuffer
-} = require("raganork-bot");
-const {
-  Module,
-  commands
-} = require('../main')
-const {
-  MODE,
-  ALIVE,
-  BOT_INFO
-} = require('../config');
-const config = require('../config');
-const {
-  parseAlive
-} = require('./misc/misc');
-let w = MODE == 'public' ? false : true
-Module({
-  pattern: 'menu',
-  fromMe: w,
-  desc: 'Is bot alive?'
-}, (async (message, match) => {
-  var myid = message.client.user.id.split(":")[0]
-  var buttons = [{
-    urlButton: {
-        displayText: 'Github',
-        url: 'https://github.com/souravkl11/raganork'
-    }
-}, {
-  urlButton: {
-    displayText: 'Contact Owner',
-    url: 'https://wa.me/'+BOT_INFO.split(";")[2]+'?text=Hey+bro'
-    }
-}, {
-    quickReplyButton: {
-        displayText: 'Bot status',
-        id: 'ping'+myid
-    }
-}, {
-    quickReplyButton: {
-        displayText: 'All commands',
-        id: 'commands'+myid
-    }  
-}, {
-    quickReplyButton: {
-        displayText: 'Support group',
-        id: 'support'+myid
-    }
-}]
-var menu = `╭═══〘 ${BOT_INFO.split(";")[0]} 〙═══⊷❍
-┃✩╭──────────────
-┃✩│
-┃✩│ Owner : ${BOT_NAME.split(";")[1]}
-┃✩│ User : ${message.senderName}
-┃✩│ Mode : ${MODE}
-┃✩│ Server : ${config.HEROKU.APP_NAME}
-┃✩│ Ram: 1024 MB
-┃✩│ Disk Space: 620 GB
-┃✩│ Version: ${config.VERSION}
-┃✩│
-┃✩│
-┃✩│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
-┃✩│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
-┃✩│   ${BOT_INFO.split(";")[0]}
-┃✩│ 
-┃✩╰───────────────
-╰═════════════════⊷
+	ctt,
+	addSpace,
+	textToStylist,
+	PREFIX,
+	getUptime,
+	PLUGINS,
+	getRam,
+} = require('../lib/')
+const { VERSION } = require('../config')
+bot.addCommand(
+	{
+		pattern: 'help ?(.*)',
+		fromMe: true,
+		dontAddCommandList: true,
+	},
+	async (message, match) => {
+		const date = new Date()
+		let CMD_HELP = `╭────────────────╮
+						ʟᴇᴠᴀɴᴛᴇʀ
+╰────────────────╯
+╭────────────────
+│ Prefix : ${PREFIX}
+│ User : ${message.pushName}
+│ Time : ${date.toLocaleTimeString()}
+│ Day : ${date.toLocaleString('en', { weekday: 'long' })}
+│ Date : ${date.toLocaleDateString('hi')}
+│ Version : ${VERSION}
+│ Plugins : ${PLUGINS.count}
+│ Ram : ${getRam()}
+│ Uptime : ${getUptime('t')}
+╰────────────────
+╭────────────────
+`
+		const commands = []
+		bot.commands.map(async (command, index) => {
+			if (
+				command.dontAddCommandList === false &&
+				command.pattern !== undefined
+			) {
+				commands.push(ctt(command.pattern))
+			}
+		})
+		commands.forEach((command, i) => {
+			CMD_HELP += `│ ${i + 1} ${addSpace(
+				i + 1,
+				commands.length
+			)}${textToStylist(command.toUpperCase(), 'mono')}\n`
+		})
+		CMD_HELP += `╰────────────────`
+		return await message.send('```' + CMD_HELP + '```')
+	}
+)
 
-‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎‎
-╭════〘 ᴀᴅᴍɪɴ 〙════⊷❍
-┃✩╭─────────────────
-┃✩│ Add
-┃✩│ Kick
-┃✩│ Promote
-┃✩│ Demote
-┃✩│ Warn
-┃✩│ Poll
-┃✩│ Tagall
-┃✩│ Mute
-┃✩│ Unmute
-┃✩╰─────────────────
-╰══════════════════⊷❍
-╭════〘 download 〙════⊷❍
-┃✩╭─────────────────
-┃✩│ Insta
-┃✩│ Ig
-┃✩│ Video
-┃✩│ Yts
-┃✩│ Ytv
-┃✩│ Story
-┃✩│ Img
-┃✩│ Song
-┃✩╰─────────────────
-╰══════════════════⊷❍
-╭════〘 media 〙════⊷❍
-┃✩╭─────────────────
-┃✩│ avmix
-┃✩│ trim
-┃✩│ slowmo
-┃✩│ reverse
-┃✩│ gif
-┃✩╰─────────────────
-╰══════════════════⊷❍`
-return await message.sendImageTemplate(await skbuffer(BOT_INFO.split(";")[3]),FancyRandom(menu),"All rights reserved "+BOT_INFO.split(";")[0],buttons);
-}))
-Module({
-  pattern: 'alive',
-  fromMe: w,
-  desc: 'Is bot alive?'
-}, (async (message, match) => {
-  await parseAlive(message, ALIVE)
-}))
-Module({
-  on: 'button',
-  fromMe: w,
- }, (async (message, match) => {
-var myid = message.client.user.id.split(":")[0]
-var {button} = message
-if (button) {
-  if (button.includes(myid)&&button.startsWith("commands")) return await message.sendReply(FancyRandom(await getListFromCommand(commands)))
-  if (button.includes(myid)&&button.startsWith("ping")) {
-    const start = new Date().getTime()
-    await message.client.sendMessage(message.jid, {
-        text: FancyRandom('Ping!')
-    })
-    const end = new Date().getTime()
-    await message.sendReply(FancyRandom('Pong!\n ```' + (end - start) + '``` *ms*')) 
-  }
-  if (button.includes(myid)&&button.startsWith("support")) return await message.sendReply(BOT_INFO.split(";")[4])
-} 
-}))
-Module({
-  pattern: 'ping',
-  fromMe: w,
-  desc: 'Measures ping'
-}, (async (message, match) => {
-  const start = new Date().getTime()
-  await message.client.sendMessage(message.jid, {
-      text: '*❮ ᴛᴇsᴛɪɴɢ ᴘɪɴɢ ❯*'
-  })
-  const end = new Date().getTime()
-  await message.client.sendMessage(message.jid, {
-      text: '*ʀᴇsᴘᴏɴsᴇ ɪɴ ' + (end - start) + ' _ᴍs_*'
-  }, {
-      quoted: message.data
-  })
-}));
+bot.addCommand(
+	{
+		pattern: 'list ?(.*)',
+		fromMe: true,
+		dontAddCommandList: true,
+	},
+	async (message, match) => {
+		let msg = ''
+		bot.commands.map(async (command, index) => {
+			if (
+				command.dontAddCommandList === false &&
+				command.pattern !== undefined
+			) {
+				msg += `${index} ${ctt(command.pattern)}\n${command.desc}\n\n`
+			}
+		})
+		await message.send('```' + msg.trim() + '```')
+	}
+)
+bot.addCommand(
+	{
+		pattern: 'menu ?(.*)',
+		fromMe: true,
+		dontAddCommandList: true,
+	},
+	async (message, match) => {
+		const commands = {}
+		bot.commands.map(async (command, index) => {
+			if (
+				command.dontAddCommandList === false &&
+				command.pattern !== undefined
+			) {
+				if (!commands[command.type]) commands[command.type] = []
+				commands[command.type].push(ctt(command.pattern).trim())
+			}
+		})
+		const date = new Date()
+
+		let msg =
+			'```' +
+			`╭═══ LEVANTER ═══⊷
+┃❃╭──────────────
+┃❃│ Prefix : ${PREFIX}
+┃❃│ User : ${message.pushName}
+┃❃│ Time : ${date.toLocaleTimeString()}
+┃❃│ Day : ${date.toLocaleString('en', { weekday: 'long' })}
+┃❃│ Date : ${date.toLocaleDateString('hi')}
+┃❃│ Version : ${VERSION}
+┃❃│ Plugins : ${PLUGINS.count}
+┃❃│ Ram : ${getRam()}
+┃❃│ Uptime : ${getUptime('t')}
+┃❃╰───────────────
+╰═════════════════⊷
+` +
+			'```'
+		for (const command in commands) {
+			msg += ` ╭─❏ ${textToStylist(
+				command.toLowerCase(),
+				'smallcaps'
+			)} ❏
+`
+			for (const plugin of commands[command])
+				msg += ` │ ${textToStylist(plugin.toUpperCase(), 'mono')}\n`
+			msg += ` ╰─────────────────
+`
+		}
+		await message.send(msg.trim())
+	}
+)
